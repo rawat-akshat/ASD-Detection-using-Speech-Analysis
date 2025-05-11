@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Typography, Box, CircularProgress } from '@mui/material';
+import { Paper, Typography, Box} from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 

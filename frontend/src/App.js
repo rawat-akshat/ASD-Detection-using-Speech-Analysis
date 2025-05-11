@@ -23,6 +23,7 @@ const theme = createTheme({
 function App() {
   const [results, setResults] = React.useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   const handleStartAnalysis = () => {
     setIsAnalyzing(true);
@@ -74,13 +75,13 @@ function App() {
           <Box sx={{ mt: 4 }}>
             <AudioRecorder 
               onResultsChange={setResults}
-              isRecording={isAnalyzing}
-              setIsRecording={setIsAnalyzing}
+              isRecording={isRecording}
+              setIsRecording={setIsRecording}
             />
           </Box>
 
           <Box sx={{ mt: 4 }}>
-            <AudioVisualizer isRecording={isAnalyzing} />
+            <AudioVisualizer isRecording={isRecording} />
           </Box>
 
           <Box sx={{ mt: 4 }}>
