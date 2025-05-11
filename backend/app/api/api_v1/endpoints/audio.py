@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, WebSocket, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, WebSocket, BackgroundTasks, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from typing import List
 import numpy as np
@@ -126,4 +126,19 @@ async def get_recording(filename: str):
         return JSONResponse(
             status_code=404,
             content={"message": f"Recording '{filename}' not found."}
-        ) 
+        )
+
+@router.delete("/recordings/{filename}")
+async def delete_recording(filename: str):
+    """
+    Delete a specific recording by filename
+    """
+    file_path = os.path.join(RECORDINGS_DIR, filename)
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+            return {"message": f"Recording '{filename}' deleted successfully."}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error deleting recording: {str(e)}")
+    else:
+        raise HTTPException(status_code=404, detail=f"Recording '{filename}' not found.") 

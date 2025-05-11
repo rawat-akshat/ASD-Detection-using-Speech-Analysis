@@ -7,6 +7,7 @@ import StopIcon from '@mui/icons-material/Stop';
 import AudioRecorder from './components/AudioRecorder';
 import AudioVisualizer from './components/AudioVisualizer';
 import ResultsDisplay from './components/ResultsDisplay';
+import RecordingsList from './components/RecordingsList';
 
 const theme = createTheme({
   palette: {
@@ -86,6 +87,10 @@ function App() {
 
           <Box sx={{ mt: 4 }}>
             <ResultsDisplay results={results} />
+          </Box>
+
+          <Box sx={{ mt: 4 }}>
+            <RecordingsList />
           </Box>
         </Box>
       </Container>
