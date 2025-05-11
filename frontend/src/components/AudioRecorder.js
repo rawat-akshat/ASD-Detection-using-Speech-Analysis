@@ -3,7 +3,6 @@ import { Box, Button, Paper, Typography } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import RecordingsList from './RecordingsList';
 
 const AudioRecorder = ({ onResultsChange, isRecording, setIsRecording }) => {
   const mediaRecorderRef = useRef(null);
@@ -129,8 +128,6 @@ const AudioRecorder = ({ onResultsChange, isRecording, setIsRecording }) => {
           </Button>
         </Box>
       </Paper>
-      
-      <RecordingsList />
     </>
   );
 };
