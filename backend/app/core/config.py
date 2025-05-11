@@ -1,12 +1,13 @@
 # backend/config.py
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import List
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "ASD Detection System"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
+    DEBUG: bool = False
     
     # Security
     SECRET_KEY: str
@@ -32,5 +33,6 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "allow"  # Allow extra fields from .env
 
 settings = Settings()
