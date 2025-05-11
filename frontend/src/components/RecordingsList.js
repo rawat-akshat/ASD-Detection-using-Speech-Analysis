@@ -22,10 +22,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
+import Radio from '@mui/material/Radio';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const BACKEND_URL = 'http://localhost:8000';
 
-const RecordingsList = () => {
+const RecordingsList = ({ onSelect, selectedRecording }) => {
   const [recordings, setRecordings] = useState([]);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -116,6 +118,10 @@ const RecordingsList = () => {
     setToDelete(null);
   };
 
+  const handleSelect = (filename) => {
+    if (onSelect) onSelect(filename);
+  };
+
   return (
     <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -176,9 +182,22 @@ const RecordingsList = () => {
                   </Box>
                 }
               >
-                <ListItemText
-                  primary={formatFilename(filename)}
-                  secondary={`Recording ${index + 1}`}
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={selectedRecording === filename}
+                      onChange={() => handleSelect(filename)}
+                      value={filename}
+                      name="recording-radio"
+                    />
+                  }
+                  label={
+                    <ListItemText
+                      primary={formatFilename(filename)}
+                      secondary={`Recording ${index + 1}`}
+                    />
+                  }
+                  sx={{ flex: 1 }}
                 />
               </ListItem>
               {index < recordings.length - 1 && <Divider />}

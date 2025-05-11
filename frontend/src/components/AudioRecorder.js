@@ -3,16 +3,18 @@ import { Box, Button, Paper, Typography } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import Recorder from 'recorder-js';
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const recorder = new Recorder(audioContext);
 
 const AudioRecorder = ({ onResultsChange, isRecording, setIsRecording }) => {
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-  const wsRef = useRef(null);
+  const streamRef = useRef(null);
 
   useEffect(() => {
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
   }, []);
@@ -34,46 +36,29 @@ const AudioRecorder = ({ onResultsChange, isRecording, setIsRecording }) => {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-
-      // Connect to WebSocket
-      wsRef.current = new WebSocket('ws://localhost:8000/api/v1/audio/stream');
-      
-      wsRef.current.onmessage = (event) => {
-        const result = JSON.parse(event.data);
-        onResultsChange(result);
-      };
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(event.data);
-        }
-      };
-
-      mediaRecorderRef.current.start(1000); // Collect data every second
+      streamRef.current = stream;
+      await recorder.init(stream);
+      recorder.start();
       setIsRecording(true);
     } catch (err) {
       console.error('Error accessing microphone:', err);
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+  const stopRecording = async () => {
+    try {
+      const { blob } = await recorder.stop();
       setIsRecording(false);
-      
-      if (wsRef.current) {
-        wsRef.current.close();
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
-
-      // Save the recording to backend
+      // Now blob is a real WAV file!
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `recording_${timestamp}.wav`;
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-      saveRecordingToBackend(audioBlob, filename);
+      saveRecordingToBackend(blob, filename);
+    } catch (err) {
+      console.error('Error stopping recording:', err);
     }
   };
 
