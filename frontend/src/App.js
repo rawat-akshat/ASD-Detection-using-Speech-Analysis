@@ -40,7 +40,7 @@ function App() {
       <CssBaseline />
       <Container maxWidth="md">
         <Box sx={{ my: 4 }}>
-          <Typography variant="h3" component="h1" gutterBottom align="center">
+          <Typography variant="h3" component="h1" gutterBottom align="center" fontWeight="bold">
             ASD Detection System
           </Typography>
           <Typography variant="h6" component="h2" gutterBottom align="center" color="text.secondary">

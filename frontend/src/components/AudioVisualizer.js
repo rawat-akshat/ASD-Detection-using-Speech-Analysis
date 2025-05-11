@@ -4,27 +4,27 @@ import WaveSurfer from 'wavesurfer.js';
 import MicIcon from '@mui/icons-material/Mic';
 
 const AudioVisualizer = ({ isRecording }) => {
-  const waveformRef = useRef(null);
-  const wavesurferRef = useRef(null);
+  const containerRef = useRef(null);
+  const waveSurferRef = useRef(null);
 
   useEffect(() => {
-    if (!wavesurferRef.current) {
-      wavesurferRef.current = WaveSurfer.create({
-        container: waveformRef.current,
+    if (containerRef.current && !waveSurferRef.current) {
+      waveSurferRef.current = WaveSurfer.create({
+        container: containerRef.current,
         waveColor: '#2196f3',
         progressColor: '#f50057',
-        cursorColor: 'transparent',
+        cursorColor: '#333',
         barWidth: 2,
-        barRadius: 3,
+        barRadius: 2,
         responsive: true,
-        height: 100,
-        barGap: 3
+        height: 80,
       });
     }
 
     return () => {
-      if (wavesurferRef.current) {
-        wavesurferRef.current.destroy();
+      if (waveSurferRef.current) {
+        waveSurferRef.current.destroy();
+        waveSurferRef.current = null;
       }
     };
   }, []);
@@ -35,7 +35,7 @@ const AudioVisualizer = ({ isRecording }) => {
         Audio Visualization
       </Typography>
       {isRecording ? (
-        <div ref={waveformRef} style={{ width: '100%', height: '100px' }} />
+        <div ref={containerRef} style={{ width: '100%', minHeight: 80 }} />
       ) : (
         <Box 
           sx={{ 

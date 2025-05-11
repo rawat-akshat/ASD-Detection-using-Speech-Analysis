@@ -1,14 +1,17 @@
 from fastapi import APIRouter, UploadFile, File, WebSocket, BackgroundTasks
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from typing import List
 import numpy as np
 import librosa
 from app.core.config import settings
 from app.models.audio_processor import AudioProcessor
 from app.schemas.audio import AudioResponse, AudioFeatures
+import os
 
 router = APIRouter()
 audio_processor = AudioProcessor()
+
+RECORDINGS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../data/recordings'))
 
 @router.post("/process", response_model=AudioResponse)
 async def process_audio(
@@ -77,4 +80,50 @@ async def get_audio_features():
             description="Mel spectrogram features",
             parameters={"n_mels": 128}
         )
-    ] 
+    ]
+
+@router.post("/store")
+async def store_audio(file: UploadFile = File(...)):
+    """
+    Store uploaded audio file permanently in the recordings directory
+    """
+    try:
+        os.makedirs(RECORDINGS_DIR, exist_ok=True)
+        file_location = os.path.join(RECORDINGS_DIR, file.filename)
+        with open(file_location, "wb") as f:
+            f.write(await file.read())
+        return {"message": f"File '{file.filename}' stored successfully."}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"message": f"Error storing audio: {str(e)}"}
+        )
+
+@router.get("/recordings")
+async def list_recordings():
+    """
+    List all stored recordings
+    """
+    try:
+        os.makedirs(RECORDINGS_DIR, exist_ok=True)
+        files = [f for f in os.listdir(RECORDINGS_DIR) if os.path.isfile(os.path.join(RECORDINGS_DIR, f))]
+        return {"recordings": files}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"message": f"Error listing recordings: {str(e)}"}
+        )
+
+@router.get("/recordings/{filename}")
+async def get_recording(filename: str):
+    """
+    Download a specific recording by filename
+    """
+    file_path = os.path.join(RECORDINGS_DIR, filename)
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type='audio/wav', filename=filename)
+    else:
+        return JSONResponse(
+            status_code=404,
+            content={"message": f"Recording '{filename}' not found."}
+        ) 
