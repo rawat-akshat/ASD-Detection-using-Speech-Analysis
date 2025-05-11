@@ -29,6 +29,7 @@ function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [selectedRecording, setSelectedRecording] = useState(null);
   const [showSelectAlert, setShowSelectAlert] = useState(false);
+  const [audioStream, setAudioStream] = useState(null);
 
   const handleStartAnalysis = async () => {
     if (!selectedRecording) {
@@ -110,7 +111,10 @@ function App() {
           </Box>
 
           <Box sx={{ mt: 4 }}>
-            <AudioVisualizer isRecording={isRecording} />
+            <AudioVisualizer 
+              isRecording={isRecording} 
+              audioStream={audioStream}
+            />
           </Box>
 
           <Box sx={{ mt: 4 }}>

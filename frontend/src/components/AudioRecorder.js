@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Box, Button, Paper, Typography } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
@@ -10,6 +10,7 @@ const recorder = new Recorder(audioContext);
 
 const AudioRecorder = ({ onResultsChange, isRecording, setIsRecording }) => {
   const streamRef = useRef(null);
+  const [audioStream, setAudioStream] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -37,6 +38,7 @@ const AudioRecorder = ({ onResultsChange, isRecording, setIsRecording }) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
+      setAudioStream(stream);
       await recorder.init(stream);
       recorder.start();
       setIsRecording(true);
@@ -49,6 +51,7 @@ const AudioRecorder = ({ onResultsChange, isRecording, setIsRecording }) => {
     try {
       const { blob } = await recorder.stop();
       setIsRecording(false);
+      setAudioStream(null);
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
         streamRef.current = null;
